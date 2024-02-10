@@ -7,9 +7,13 @@ function getTotalAccountsCount(accounts) {
 };
 
 function getBooksBorrowedCount(books) {
-  let rentedBooks = books.filter((book) => book.borrows.filter((record) => record.returned === false).length > 0);
-  return rentedBooks.length;
-};
+  const count = books.reduce((result, book) => {
+    if (book.borrows[0].returned === false) result++;
+    return result;
+  }, 0)
+
+  return count;
+}
 
 function getMostCommonGenres(books) {
   let map = {};

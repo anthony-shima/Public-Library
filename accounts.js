@@ -22,32 +22,30 @@ function getTotalNumberOfBorrows(account, books) {
   return totalRented;
 };
 
-function getBooksPossessedByAccount(account, books, authors) {
-  let result = [];
-  let rentedMatch = [];
-  books.forEach((item) => {
-   const borrowed = item.borrows;
-   const book = {
-    id: item.id,
-    title: item.title,
-    genre: item.genre,
-    authorId: item.authorId,
-    author: {},
-    borrows: {}
-   };
-   const { id, title, genre, authorId, author, borrows } = book;
- 
-   borrowed.forEach((borrow) => {
-    if (borrow.id === account.id && borrow.returned === false) {
-     result.push(book);
-     rentedMatch.push(borrow);
-     book.borrows = rentedMatch;
-     book.author = authors.filter((auth) => auth.id === book.authorId)[0];
-    }
-   });
+function addAuthorsToBooks(books, authors) {
+  books.forEach((book) => {
+    const authorInfo = authors.find((author) => author.id === book.authorId);
+    book['author'] = authorInfo;
   });
+  
+  return books;
+}
+
+function getBooksPossessedByAccount(account, books, authors) {
+  const accountId = account.id;
+  const result = [];
+  addAuthorsToBooks(books,authors);
+
+  books.forEach((book) => {
+    const newestBorrow = book.borrows[0];
+
+    if (newestBorrow.id === accountId && !newestBorrow.returned) {
+      result.push(book);
+    }
+  });
+
   return result;
-};
+}
 
 module.exports = {
   findAccountById,
